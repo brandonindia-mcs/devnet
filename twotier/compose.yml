@@ -1,0 +1,12 @@
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    image: contosorealtime/auth-service:1.0
+
+  txn-service:
+    build:
+      context: ./tx-service
+      dockerfile: Dockerfile
+    image: contosorealtime/tx-service:1.0
