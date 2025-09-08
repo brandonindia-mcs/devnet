@@ -1,11 +1,13 @@
-export project=k8s-level-1
+#!/bin/bash
+. ./k.config.s
 export service=nginx-service
 export deployment=nginx-deployment
-export namespace=lab
+export namespace=lab01
 export release="ingress-nginx"
 export chart="ingress-nginx/ingress-nginx"
 export localhostname=nginx.local
-mkdir -p ./$project
+_project=k8s-lab-01
+mkdir -p ./$__project
 
 helm repo add $release https://kubernetes.github.io/ingress-nginx
 helm repo update
@@ -18,7 +20,7 @@ helm install $release $chart \
   --namespace $namespace \
   --set controller.publishService.enabled=true
 echo "⏳ Waiting for ingress controller pod to be ready..."
-kubectl wait --namespace $namespace \
+k wait --namespace $namespace \
   --for=condition=Ready pod \
   --selector=app.kubernetes.io/name=$release \
   --timeout=120s
@@ -26,7 +28,7 @@ helm list --all-namespaces
 kcfg view --minify | grep namespace
 
 ### KUBERNETES ON DEPLOYMENT DOCKER
-echo|cat >./$project/$deployment.yaml <<EOF
+echo|cat >./$_project/$deployment.yaml <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -60,7 +62,7 @@ spec:
     targetPort: 80
     nodePort: 30080
 EOF
-echo|cat >./$project/ingress.yaml <<EOF
+echo|cat >./$_project/ingress.yaml <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -80,8 +82,8 @@ spec:
               number: 80
 EOF
 
-ka -f ./$project/$deployment.yaml
-ka -f ./$project/ingress.yaml
+ka -f ./$_project/$deployment.yaml
+ka -f ./$_project/ingress.yaml
 kg pods,svc,pods
 
 

@@ -1,0 +1,10 @@
+alias k="kubectl"
+alias k="kubectl"
+alias kg="kubectl get"
+alias kd="kubectl delete"
+alias kc="kubectl config"
+alias ka="kubectl apply"
+alias ke="kubectl expose"
+alias kc="kubectl create"
+alias kcfg="kubectl config"
+  
