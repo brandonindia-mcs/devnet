@@ -2,8 +2,9 @@
 . ./k.config.sh
 
 export _namespace=lab00
-_nginx=nginx-deployment
-_project=k8s-lab-00
+export _cluster=lab-cluster
+export _nginx=nginx-deployment
+export _project=k8s-lab-00
 mkdir -p ./$_project
 
 kg namespace $_namespace >/dev/null 2>&1 || kc namespace $_namespace
@@ -43,8 +44,7 @@ k expose deployment $_nginx --port=80 --type=LoadBalancer
 k get pods,svc
 
 # CREATE A 3-NODE CLUSTER
-_cluster=kind-cluster-config
-echo|cat >./$_project/$_cluster.yaml <<EOF
+echo|cat >./$_project/$_cluster-config.yaml <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -52,8 +52,10 @@ nodes:
 - role: worker
 - role: worker
 EOF
-kind create cluster --config ./$_project/$_cluster.yaml
-k config rename-context kind-kind kind-cluster-lab00
+kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
+
+# RENAME DEFAULT
+k config rename-context kind-kind kind-lab-cluster
 
 # CLEAN UP
 k get deployment
