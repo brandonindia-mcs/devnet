@@ -7,5 +7,11 @@ k delete namespace $_namespace
 
 
 k config get-contexts
-kubectl config use-context docker-desktop
+kcfg use-context docker-desktop
 kubectl config use-context kind-kind
+kcfg set-context --current --namespace default
+
+kcfg set-context --current --namespace default
+k get namespaces
+kubectl get all --all-namespaces
+
