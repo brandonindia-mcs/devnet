@@ -44,15 +44,33 @@ k expose deployment $_nginx --port=80 --type=LoadBalancer
 k get pods,svc
 
 # CREATE A 3-NODE CLUSTER
+kubernetes_version=$(k version|grep -i 'client version'|awk '{print $3}')\
+  echo "k8s version $kubernetes_version"
 echo|cat >./$_project/$_cluster-config.yaml <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
+  image: kindest/node:$kubernetes_version
 - role: worker
+  image: kindest/node:$kubernetes_version
 - role: worker
+  image: kindest/node:$kubernetes_version
 EOF
 kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
+
+# # CREATE A 3-NODE CLUSTER
+# echo|cat >./$_project/$_cluster-config.yaml <<EOF
+# kind: Cluster
+# apiVersion: kind.x-k8s.io/v1alpha4
+# nodes:
+#   - role: control-plane
+#   - role: worker
+#   - role: worker
+# image: kindest/node:$kubernetes_version
+# EOF
+# kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
+
 
 # RENAME DEFAULT
 k config rename-context kind-kind kind-lab-cluster
