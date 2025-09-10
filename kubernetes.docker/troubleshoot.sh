@@ -22,6 +22,12 @@ kg namespace $_namespace\
   || kc namespace $_namespace\
   && kcfg set-context --current --namespace $_namespace
 
+  
+## DELETE CLUSTER AND SET DEFAULT
+kind delete cluster -n $_cluster\
+  && kcfg use-context docker-desktop\
+  && kcfg set-context --current --namespace default
+
 
 ### DELETE ALL IN NAMESPACE
 kd all --all --namespace=$_namespace
@@ -36,12 +42,6 @@ kind delete cluster -n $_cluster
 ## REMOVE A HELM AT NAMESPACE
 helm uninstall $_helm_release \
   --namespace $_namespace
-
-  
-## DELETE CLUSTER AND SET DEFAULT
-kind delete cluster -n $_cluster\
-  && kcfg use-context docker-desktop\
-  && kcfg set-context --current --namespace default
 
 helm list --all-namespaces
 helm uninstall my-redis --namespace default
