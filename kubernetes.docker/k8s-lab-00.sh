@@ -1,51 +1,18 @@
 #!/bin/bash
-. ./k.config.sh
-
 export _namespace=lab00
 export _cluster=lab-cluster
 export _nginx=nginx-deployment
+export _ingress_service=nginx-service
 export _project=k8s-lab-00
 mkdir -p ./$_project
 
-kg namespace $_namespace >/dev/null 2>&1 || kc namespace $_namespace
-kcfg set-context --current --namespace=$_namespace
-
-### KUBERNETES ON DEPLOYMENT DOCKER
-echo|cat >./$_project/$_nginx.yaml <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: $_nginx
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:stable
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: "100m"      # ~0.1 core
-            memory: "128Mi"  # 128 MB
-          limits:
-            cpu: "250m"      # ~0.25 core
-            memory: "256Mi"  # 256 MB
-EOF
-k apply -f ./$_project/$_nginx.yaml
-k expose deployment $_nginx --port=80 --type=LoadBalancer
-k get pods,svc
+_helm_nginx_release=ingress-nginx
+_nginx_chart=ingress-nginx/ingress-nginx
+helm repo add $_helm_nginx_release https://kubernetes.github.io/$_helm_nginx_release
 
 # CREATE A 3-NODE CLUSTER
-kubernetes_version=$(k version|grep -i 'client version'|awk '{print $3}')\
-  echo "k8s version $kubernetes_version"
+kubernetes_version=$(kubectl version|grep -i 'client version'|awk '{print $3}')\
+  && echo "k8s version $kubernetes_version"
 echo|cat >./$_project/$_cluster-config.yaml <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -59,49 +26,42 @@ nodes:
 EOF
 kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
 
-# # CREATE A 3-NODE CLUSTER
-# echo|cat >./$_project/$_cluster-config.yaml <<EOF
-# kind: Cluster
-# apiVersion: kind.x-k8s.io/v1alpha4
-# nodes:
-#   - role: control-plane
-#   - role: worker
-#   - role: worker
-# image: kindest/node:$kubernetes_version
-# EOF
-# kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
-
-
-# RENAME DEFAULT
-k config rename-context kind-kind kind-lab-cluster
-
-# CLEAN UP
-k get deployment
-k get svc
-k get pods
-helm list
-
-
-
-k delete deployment $_nginx
-k delete svc $_nginx
-k delete pods --all
-
+# SET ACTIVE CLUSTER
+kubectl config use-context kind-$_cluster
+# NEW NAMESPACE IN CLUSTER
+kubectl get namespace $_namespace >/dev/null 2>&1 || kubectl create namespace $_namespace
+# SET ACTIVE NAMESPACE
+kubectl config set-context --current --namespace=$_namespace
+:
 
 
 ### REDIS CLUSTER
 # ADD STABLE REPO AND DEPLOY CHARTS:
 helm repo add bitnami https://charts.bitnami.com/bitnami
 ls ~/.cache/helm/repository/
-# helm repo rm bitnami
-helm install $_project-redis bitnami/redis
+# HELM REPO RM BITNAMI
+helm install $_project-redis bitnami/redis --namespace $_namespace
 helm env
+:
+kubectl get svc,pods,deployment
+helm list
+:
+kubectl delete deployment $_project-redis
+kubectl delete svc $_project-redis-replicas
+kubectl delete svc $_project-redis-headless
+kubectl delete svc $_project-redis-master
 
-k delete deployment $_project-redis
-k delete svc $_project-redis-replicas
-k delete svc $_project-redis-headless
-k delete svc $_project-redis-master
 
+kubectl get svc,pods,deployment
+helm list
+
+# CLEAN UP
+kind delete cluster -n $_cluster
+
+
+kubectl delete deployment $_nginx
+kubectl delete svc $_nginx
+kubectl delete pods --all
 
 
 ### LOCAL CONTAINER REGISTRY

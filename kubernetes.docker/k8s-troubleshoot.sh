@@ -38,9 +38,10 @@ helm uninstall $_helm_release \
   --namespace $_namespace
 
   
-## DELETE CLUSTER
-kind delete cluster -n $_cluster
-
+## DELETE CLUSTER AND SET DEFAULT
+kind delete cluster -n $_cluster\
+  && kcfg use-context docker-desktop\
+  && kcfg set-context --current --namespace default
 
 helm list --all-namespaces
 helm uninstall my-redis --namespace default
