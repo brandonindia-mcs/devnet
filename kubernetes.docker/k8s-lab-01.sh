@@ -151,4 +151,4 @@ kubectl config use-context $default_cluster
 kubectl config set-context --current --namespace default
 sudo sed -i '' '/$localhostname/d' /etc/hosts
 
-echo WE\'RE DONE
+echo $_project script finished
