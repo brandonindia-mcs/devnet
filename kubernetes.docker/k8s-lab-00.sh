@@ -1,18 +1,23 @@
-#!/bin/bash
-export _namespace=lab00
-export _cluster=lab-cluster
-export _nginx=nginx-deployment
-export _ingress_service=nginx-service
+#!/usr/local/bin/bash
 export _project=k8s-lab-00
+lab_cluster=lab-cluster
+default_cluster=docker-desktop
+export _cluster=$lab_cluster && kind=kind-
+export _namespace=lab00
+
+nginx_release="ingress-nginx"
+helm_chart="ingress-nginx/ingress-nginx"
+
+nginx_service=lab00-nginx-service
+nginx_deployment=lab00-nginx-deployment
 mkdir -p ./$_project
 
-_helm_nginx_release=ingress-nginx
-_nginx_chart=ingress-nginx/ingress-nginx
-helm repo add $_helm_nginx_release https://kubernetes.github.io/$_helm_nginx_release
+helm repo add $nginx_release https://kubernetes.github.io/ingress-nginx
+helm repo update
 
 # CREATE A 3-NODE CLUSTER
 kubernetes_version=$(kubectl version|grep -i 'client version'|awk '{print $3}')\
-  && echo "k8s version $kubernetes_version"
+  && echo "new kind cluster: k8s version $kubernetes_version"
 echo|cat >./$_project/$_cluster-config.yaml <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -24,24 +29,42 @@ nodes:
 - role: worker
   image: kindest/node:$kubernetes_version
 EOF
-kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml
 
-# SET ACTIVE CLUSTER
-kubectl config use-context kind-$_cluster
+# NEW CLUSTER
+kind create cluster -n $_cluster --config ./$_project/$_cluster-config.yaml\
+  || kubectl config use-context ${kind}$_cluster
 # NEW NAMESPACE IN CLUSTER
-kubectl get namespace $_namespace >/dev/null 2>&1 || kubectl create namespace $_namespace
+kubectl get namespace $_namespace >/dev/null 2>&1\
+  || kubectl create namespace $_namespace
 # SET ACTIVE NAMESPACE
 kubectl config set-context --current --namespace=$_namespace
+context
 :
 
-
-### REDIS CLUSTER
+### REDIS
+redis_namespace=redis-lab
+kubectl create namespace $redis_namespace\
+  || kubectl config set-context --current --namespace=$redis_namespace
+context
 # ADD STABLE REPO AND DEPLOY CHARTS:
 helm repo add bitnami https://charts.bitnami.com/bitnami
-ls ~/.cache/helm/repository/
-# HELM REPO RM BITNAMI
-helm install $_project-redis bitnami/redis --namespace $_namespace
+helm repo update
+
+helm install redis-cluster bitnami/redis-cluster \
+  --namespace $redis_namespace \
+  --set cluster.enabled=true \
+  --set replica.replicaCount=1 \
+  --set usePassword=false \
+  --set persistence.enabled=false
+
+helm install $_project-redis bitnami/redis
+
 helm env
+
+kubectl get pods -n $redis_namespace
+# VERIFY REDIS DEPLOYMENT
+kubectl exec -it redis-cluster-0 -n $redis_namespace -- redis-cli -c cluster nodes
+
 :
 kubectl get svc,pods,deployment
 helm list
@@ -54,17 +77,19 @@ kubectl delete svc $_project-redis-master
 
 kubectl get svc,pods,deployment
 helm list
-
+:
 # CLEAN UP
 kind delete cluster -n $_cluster
-
-
 kubectl delete deployment $_nginx
 kubectl delete svc $_nginx
 kubectl delete pods --all
 
 
-### LOCAL CONTAINER REGISTRY
-# MACOS CONTROL CENTER RUNS ON PORT 5000
+## LOCAL CONTAINER REGISTRY
+MACOS CONTROL CENTER RUNS ON PORT 5000
 docker run -d -p 5001:5000 --name registry registry:2
 docker rm -f registry
+
+kubectl config use-context docker-desktop\
+  && kubectl config set-context --current --namespace default
+echo $_project script finished
