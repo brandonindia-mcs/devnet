@@ -1,7 +1,6 @@
 #!/usr/local/bin/bash
 export _project=k8s-lab-01
 
-lab_cluster=lab-cluster
 default_cluster=docker-desktop
 export _cluster=$default_cluster && unset kind
 export _namespace=lab01
@@ -9,24 +8,32 @@ export _namespace=lab01
 localhostname=nginx.local
 
 nginx_release="ingress-nginx"
-helm_chart="ingress-nginx/ingress-nginx"
+nginx_chart="ingress-nginx/ingress-nginx"
 
 nginx_service=lab01-nginx-service
 nginx_deployment=lab01-nginx-deployment
 mkdir -p ./$_project
-_varlist_=()
-_varlist_+=($_project)
-_varlist_+=($_cluster)
-_varlist_+=($_namespace)
-_varlist_+=($localhostname)
-_varlist_+=($nginx_release)
-_varlist_+=($helm_chart)
-_varlist_+=($nginx_service)
-_varlist_+=($nginx_deployment)
 kubectl config use-context ${kind}${_cluster}
 :
 helm repo add $nginx_release https://kubernetes.github.io/ingress-nginx
 helm repo update
+
+declare -A _VARIABLES
+_VARIABLES[_project]=$_project
+_VARIABLES[_cluster]=$_cluster
+_VARIABLES[_namespace]=$_namespace
+function print_vars {
+  echo '************'
+  for key in "${!_VARIABLES[@]}"; do
+  echo "Key: $key: ${_VARIABLES[$key]}"
+  done
+
+  context
+  echo '************'
+}
+function context {
+  echo -e "\n$(echo -n context: && kubectl config current-context && echo -n namespace: && kubectl config view --minify --output 'jsonpath={..namespace}')"
+}
 
 # kubectl get namespace $_namespace >/dev/null 2>&1 || kubectl create namespace $_namespace
 # kubectl config set-context --current --namespace=$_namespace
@@ -36,20 +43,21 @@ kubernetes_version=$(kubectl version|grep -i 'client version'|awk '{print $3}')\
   && echo "k8s version $kubernetes_version"\
   && kubectl config use-context ${kind}${_cluster} 2>/dev/null\
   || kind create cluster -n $_cluster --config ../k8s-lab-00/$_cluster-config.yaml
-context
+print_vars
 :
 kubectl get namespace $_namespace\
   || kubectl create namespace $_namespace\
   && kubectl config set-context --current --namespace=$_namespace
-context
 kubectl get all --namespace $_namespace
+print_vars
 
 # ERROR | 000 ) 404
-echo nginx http status code:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
-
+kubectl get pods,svc,deployment,ingress
+echo nginx http status code for 127.0.0.1:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
 :
+echo -e "installing $nginx_release $nginx_chart..."
 # INSTALL THE INGRESS-NGINX CONTROLLER
-helm install $nginx_release $helm_chart \
+helm install $nginx_release $nginx_chart \
   --namespace $_namespace \
   --set controller.publishService.enabled=true
 echo -e "\n⏳ Waiting for ingress controller pod to be ready..."
@@ -60,8 +68,11 @@ kubectl wait --namespace $_namespace \
 echo -ne "\nhelm list --all-namespaces:\n$(helm list --all-namespaces)\n"
 echo -ne "\nkubectl config view --minify:\n$(kubectl config view --minify)\n"
 
+kubectl get pods,svc,deployment,ingress
 # 404
-echo nginx http status code:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
+echo nginx http status code for 127.0.0.1:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
+# 000
+echo nginx http status code for $localhostname:$(curl -s -o /dev/null -w "%{http_code}" $localhostname)
 :
 ### KUBERNETES ON DEPLOYMENT DOCKER
 echo|cat >./$_project/$nginx_deployment.yaml <<EOF
@@ -124,31 +135,32 @@ spec:
             port:
               number: 80
 EOF
-
-kubectl get all --namespace $_namespace
-
+:
 kubectl get pods,svc,deployment
 kubectl apply  -f ./$_project/$nginx_deployment.yaml
 kubectl apply  -f ./$_project/ingress.$_project.yaml
 kubectl get pods,svc,deployment
 
-# 404
-echo nginx http status code:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
 
+# 404
+echo nginx http status code for 127.0.0.1:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
+echo nginx http status code for $localhostname:$(curl -s -o /dev/null -w "%{http_code}" $localhostname)
+:
 # APPLY THE INGRESS CONTROLLER, THEN ADD /ETC/HOSTS MAPPING
 echo "127.0.0.1 $localhostname" | sudo tee -a /etc/hosts
 kubectl get pods,svc,deployment
 :
 # 200
-echo nginx http status code:$(curl -s -o /dev/null -w "%{http_code}" $localhostname)
+echo nginx http status code for 127.0.0.1:$(curl -s -o /dev/null -w "%{http_code}" 127.0.0.1)
+echo nginx http status code for $localhostname:$(curl -s -o /dev/null -w "%{http_code}" $localhostname)
 
 # kubectl get all --namespace $_namespace
 
 :
-helm uninstall $nginx_release --namespace $_namespace
-kubectl delete namespace $_namespace
-kubectl config use-context $default_cluster
-kubectl config set-context --current --namespace default
-sudo sed -i '' '/$localhostname/d' /etc/hosts
+# helm uninstall $nginx_release --namespace $_namespace
+# kubectl delete namespace $_namespace
+# kubectl config use-context $default_cluster
+# kubectl config set-context --current --namespace default
+# sudo sed -i '' '/$localhostname/d' /etc/hosts
 
 echo $_project script finished
