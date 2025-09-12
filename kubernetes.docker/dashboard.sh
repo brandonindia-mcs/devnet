@@ -1,13 +1,12 @@
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 helm repo update
-
 helm upgrade --install kubernetes-dashboard \
   kubernetes-dashboard/kubernetes-dashboard \
   --namespace kubernetes-dashboard \
   --create-namespace
-
 # START LOCAL PROXY
-kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+browser_port=8443
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy $browser_port:443
 
 # browser: https://localhost:8443
 
@@ -27,11 +26,11 @@ kubectl create clusterrolebinding k8sadmin \
 # Step 3: Retrieve the Bearer Token
 # This will output a valid Bearer token you can use to log into the Dashboard.
 # For Kubernetes versions prior to 1.24:
-kubectl -n kube-system get secret \
-  | grep k8sadmin
+# kubectl -n kube-system get secret \
+#   | grep k8sadmin
 
-kubectl -n kube-system describe secret <secret-name> \
-  | grep 'token:'
+# kubectl -n kube-system describe secret <secret-name> \
+#   | grep 'token:'
 
 # For Kubernetes 1.24+, tokens are no longer stored in secrets. Instead, use:
 kubectl create token k8sadmin -n kube-system
