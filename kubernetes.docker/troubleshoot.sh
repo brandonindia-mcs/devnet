@@ -47,6 +47,10 @@ kcfg use-context docker-desktop
 kcfg set-context --current --namespace default
 kind delete cluster -n $cluster
 
+### SET CLUSTER TO DEFAULE NAMESPACE
+kcfg use-context kind-$cluster
+kcfg set-context --current --namespace default
+kd namespace $namespace
 
 ## REMOVE A HELM AT NAMESPACE
 helm uninstall $helm_release \
@@ -72,8 +76,23 @@ kcfg set-context --current --namespace default
 kcfg use-context kind-lab-cluster
 namespace=lab02
 kcfg set-context --current --namespace default
+# CLEAR NAMESPACE
 kd all --all --namespace=$namespace
 kd namespace $namespace
 
 helm uninstall ingress-nginx \
   --namespace $namespace
+
+localhostname=nginx.local
+sudo sed -i '' "/$localhostname/d" /etc/hosts
+unset localhostname
+
+sudo sed -i '' "/$localhostname/d" /etc/hosts
+
+
+# GET POD LABELS
+kubectl get pods --all-namespaces --show-labels
+kubectl describe pod $_namespace-deployment -n $namespace
+
+# GET NODE IPS
+kubectl get nodes -o wide

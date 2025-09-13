@@ -5,6 +5,7 @@ version=$(curl -L -s https://dl.k8s.io/release/stable.txt)
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl"
 
 # TARGET VERSION
+major_version=1.32
 version=1.32.2
 curl -LO "https://dl.k8s.io/release/v${version}/bin/darwin/amd64/kubectl"
 curl -LO "https://dl.k8s.io/release/v${version}/bin/darwin/amd64/kubectl.sha256"
@@ -32,3 +33,4 @@ kind version
 kind help
 echo ">>> kind creates and manages local Kubernetes clusters using Docker container 'nodes' <<<"
 
+brew install kubernetes-cli@${major_version}

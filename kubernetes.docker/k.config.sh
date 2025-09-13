@@ -32,6 +32,7 @@ function kube_context {
   echo -e "$(echo -n context: && kubectl config current-context && echo -n namespace: && kubectl config view --minify --output 'jsonpath={..namespace}')"
   echo '************************************'
   print_vars
+  kubectl get deployment,ingress,svc,pods
 }
 echo $0 called k.config.sh
 # CALLING_SCRIPT_NAME=$(ps -o comm= $PPID)
