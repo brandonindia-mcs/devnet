@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JWT Auth Test</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+
+  <h2>Transactions</h2>
+  <button onclick="getTransactions()">Fetch</button>
+  <pre id="output"></pre>
+
+  <script>
+  fetch('/env.json')
+    .then(res => res.json())
+    .then(data => {
+      document.body.insertAdjacentHTML('beforeend', `<pre>${JSON.stringify(data, null, 2)}</pre>`);
+    });
+</script>
+
+  <script>
+    let token = '';
+
+    function login() {
+      fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        token = data.token;
+        document.getElementById('output').textContent = 'JWT: ' + token;
+      });
+    }
+
+    function getTransactions() {
+      fetch('/api/transactions', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      });
+    }
+  </script>
+</body>
+</html>

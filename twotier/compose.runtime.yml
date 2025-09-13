@@ -1,0 +1,20 @@
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    image: docker.io/contosorealtime/auth-service:1.0
+
+  tx-service:
+    build:
+      context: ./tx-service
+      dockerfile: Dockerfile
+    image: docker.io/contosorealtime/tx-service:1.0
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: docker.io/contosorealtime/frontend:1.0
+    ports:
+      - 8081:80

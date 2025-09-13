@@ -1,0 +1,43 @@
+image:
+  repository: docker.io/contosorealtime
+  auth_tag: "1.0"
+  tx_tag: "1.0"
+  frontend_tag: "1.0"
+
+postgres:
+  host: twotierpgserver.postgres.database.azure.com
+  user: dbadmin@twotierpgserver
+  password: YourP@ssw0rd!
+  database: authdb
+
+jwt_secret: mh9k3Y8+JqD7rCnf0XeyU4tQz5VhmAd0YlBp7Km5Z2s=
+
+resources:
+  auth:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+  tx:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  frontend:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+
+ingress:
+  enabled: true
+  paths:
+    auth: "/auth"
+    api: "/api"
+    frontend: "/"

@@ -5,8 +5,7 @@ const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-  const auth = req.headers.authorization || '';
-  const token = auth.replace('Bearer ', '');
+  const token = (req.headers.authorization || '').replace('Bearer ', '');
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
@@ -22,4 +21,4 @@ app.get('/api/transactions', (req, res) => {
   ]);
 });
 
-app.listen(4000, () => console.log('Transaction service on 4000'));
+app.listen(4000, () => console.log('Transaction service running on port 4000'));

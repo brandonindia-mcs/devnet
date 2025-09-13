@@ -1,0 +1,34 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: twotier-ingress
+  namespace: twotier
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - http:
+      paths:
+      - path: {{ .Values.ingress.paths.auth }}
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-service
+            port:
+              number: 80
+      - path: {{ .Values.ingress.paths.api }}
+        pathType: Prefix
+        backend:
+          service:
+            name: tx-service
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+{{- end }}

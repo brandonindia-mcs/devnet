@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: YourP@ssw0rd!
+    ports:
+      - "5432:5432"
+
+  auth-service:
+    build: ./auth-service
+    image: docker.io/contosorealtime/auth-service:1.0
+    environment:
+      DB_HOST: postgres
+      DB_USER: dbadmin
+      DB_PASS: YourP@ssw0rd!
+      JWT_SECRET: mh9k3Y8+JqD7rCnf0XeyU4tQz5VhmAd0YlBp7Km5Z2s=
+    ports:
+      - "3000:3000"
+
+  tx-service:
+    build: ./tx-service
+    image: docker.io/contosorealtime/tx-service:1.0
+    environment:
+      JWT_SECRET: mh9k3Y8+JqD7rCnf0XeyU4tQz5VhmAd0YlBp7Km5Z2s=
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build: ./frontend
+    image: docker.io/contosorealtime/frontend:1.0
+    ports:
+      - "8080:80"
