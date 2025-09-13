@@ -20,10 +20,6 @@ networking:
 nodes:
 - role: control-plane
   image: kindest/node:$kubernetes_version
-  extraPortMappings:
-    - containerPort: $containerPort  # Maps NodePort to host for ingress
-      hostPort: $hostPort
-      protocol: TCP
 - role: worker
   image: kindest/node:$kubernetes_version
 - role: worker

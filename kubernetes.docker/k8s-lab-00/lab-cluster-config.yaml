@@ -6,10 +6,6 @@ networking:
 nodes:
 - role: control-plane
   image: kindest/node:v1.32.2
-  extraPortMappings:
-    - containerPort: 30080  # Maps NodePort to host for ingress
-      hostPort: 30080
-      protocol: TCP
 - role: worker
   image: kindest/node:v1.32.2
 - role: worker
