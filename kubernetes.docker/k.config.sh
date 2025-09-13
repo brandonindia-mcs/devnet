@@ -22,16 +22,16 @@ function print_vars {
   # for key in "${!_VARIABLES[@]}"; do
   # echo "Key: $key: ${_VARIABLES[$key]}"
   # done
-  echo -e "_project:    $_project"
-  echo -e "_cluster:    $_cluster"
-  echo -e "_namespace:  $_namespace"
-  echo '************************************'
+  echo -e "_project:      $_project"
+  echo -e "_cluster:      $_cluster"
+  echo -e "_namespace:    $_namespace"
 }
 function kube_context {
   echo '************************************'
-  echo -e "$(echo -n context: && kubectl config current-context && echo -n namespace: && kubectl config view --minify --output 'jsonpath={..namespace}')"
-  echo '************************************'
   print_vars
+  echo '************************************'
+  echo -e "$(echo -ne Cluster Context:\\t && kubectl config current-context && echo -n Current Namespace:\\t && kubectl config view --minify --output 'jsonpath={..namespace}')"
+  echo '************************************'
   kubectl get deployment,ingress,svc,pods
 }
 echo $0 called k.config.sh

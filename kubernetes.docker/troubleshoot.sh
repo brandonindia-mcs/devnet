@@ -74,6 +74,7 @@ helm list --all-namespaces
 kcfg set-context --current --namespace default
 
 kcfg use-context kind-lab-cluster
+# SWITCH NAMESPACES
 namespace=lab02
 kcfg set-context --current --namespace default
 # CLEAR NAMESPACE
