@@ -9,7 +9,8 @@ fi
 
 echo "Waiting for database..."
 for i in $(seq 1 60); do
-  if PGPASSWORD="${POSTGRES_PASSWORD}" psql "$DATABASE_URL" -c "SELECT 1" >/dev/null 2>&1; then
+  # if PGPASSWORD="${POSTGRES_PASSWORD}" psql "$DATABASE_URL" -c "SELECT 1" >/dev/null 2>&1; then
+  if psql "$DATABASE_URL" -c "SELECT 1" >/dev/null ; then
     echo "Database is up"
     exec "$@"
   fi

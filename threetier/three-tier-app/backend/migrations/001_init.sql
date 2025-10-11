@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS items (
 
 -- Seed once if empty
 INSERT INTO items (title)
-SELECT 'Welcome to the three-tier app'
+SELECT 'Welcome to the three-tier app once again'
 WHERE NOT EXISTS (SELECT 1 FROM items);

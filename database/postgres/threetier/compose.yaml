@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17
+    container_name: ${CONTAINER}
+    restart: always
+    ports:
+      - ${PGPORT}:5432
+    environment:
+      POSTGRES_USER: $PGUSER
+      POSTGRES_PASSWORD: $PGPSWD
+      POSTGRES_DB: $PGDB
+    volumes:
+      - pgdata_appdev:/var/lib/postgresql/data
+    networks:
+      - appdev
+
+networks:
+  appdev:
+    name: appdev
+    external: true
+
+volumes:
+  pgdata_appdev:

@@ -7,12 +7,13 @@ alias ka="kubectl apply"
 alias ke="kubectl expose"
 alias kc="kubectl create"
 alias kcfg="kubectl config"
+alias kl="kubectl logs"
 
 alias kdesc="kubectl describe"
 alias kconfig="kubectl config view"
 alias khelp="kubectl api-resources"
 alias context=kube_context
-
+alias kclear="kd all --all"
 
 function print_vars {
   # declare -A _VARIABLES
@@ -38,3 +39,4 @@ function kube_context {
 echo $0 called k.config.sh
 # CALLING_SCRIPT_NAME=$(ps -o comm= $PPID)
 # echo $(ps -o comm= $PPID) called k.config.sh
+alias kget="kubectl get all"

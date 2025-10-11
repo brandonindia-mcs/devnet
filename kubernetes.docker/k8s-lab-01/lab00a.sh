@@ -55,7 +55,7 @@ kubectl delete pods --all
 
 
 ## LOCAL CONTAINER REGISTRY
-MACOS CONTROL CENTER RUNS ON PORT 5000
+# MACOS CONTROL CENTER RUNS ON PORT 5000
 docker run -d -p 5001:5000 --name registry registry:2
 docker rm -f registry
 
