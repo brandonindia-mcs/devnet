@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 alias k="kubectl"
 alias kg="kubectl get"
+alias kgr="kubectl get rs"
+alias kgns="kubectl get namespace"
+alias kgp="kubectl get pod"
+alias kgd="kubectl get deployment"
+alias kgrs="kubectl get rs"
+alias kgsts="kubectl get sts"
+alias kgs="kubectl get svc"
+alias kgi="kubectl get ingress"
+
 alias kd="kubectl delete"
+alias kdi="kubectl delete ingress"
+
 alias kc="kubectl config"
 alias ka="kubectl apply"
 alias ke="kubectl expose"
 alias kc="kubectl create"
 alias kcfg="kubectl config"
 alias kl="kubectl logs"
+
+
+alias kget="kubectl get all"
 
 alias kdesc="kubectl describe"
 alias kconfig="kubectl config view"
@@ -39,4 +53,3 @@ function kube_context {
 echo $0 called k.config.sh
 # CALLING_SCRIPT_NAME=$(ps -o comm= $PPID)
 # echo $(ps -o comm= $PPID) called k.config.sh
-alias kget="kubectl get all"

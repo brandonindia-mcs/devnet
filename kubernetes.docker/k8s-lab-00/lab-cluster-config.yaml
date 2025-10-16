@@ -5,8 +5,8 @@ networking:
   podSubnet: "10.98.0.0/16"
 nodes:
 - role: control-plane
-  image: kindest/node:v1.32.2
+  image: kindest/node:v1.32.5
 - role: worker
-  image: kindest/node:v1.32.2
+  image: kindest/node:v1.32.5
 - role: worker
-  image: kindest/node:v1.32.2
+  image: kindest/node:v1.32.5

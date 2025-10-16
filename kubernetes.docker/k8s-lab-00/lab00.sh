@@ -20,10 +20,10 @@ networking:
 nodes:
 - role: control-plane
   image: kindest/node:$kubernetes_version
-- role: worker
-  image: kindest/node:$kubernetes_version
-- role: worker
-  image: kindest/node:$kubernetes_version
+# - role: worker
+#   image: kindest/node:$kubernetes_version
+# - role: worker
+#   image: kindest/node:$kubernetes_version
 EOF
 
 # NEW CLUSTER

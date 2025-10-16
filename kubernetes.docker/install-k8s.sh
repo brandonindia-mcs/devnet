@@ -6,7 +6,7 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 
 # TARGET VERSION
 major_version=1.32
-version=1.32.2
+version=1.32.5
 curl -LO "https://dl.k8s.io/release/v${version}/bin/darwin/amd64/kubectl"
 curl -LO "https://dl.k8s.io/release/v${version}/bin/darwin/amd64/kubectl.sha256"
 echo "$(cat kubectl.sha256)  kubectl" | shasum -a 256 --check
