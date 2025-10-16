@@ -3,7 +3,8 @@
 
 export _project=k8s-lab-01
 
-default_cluster=docker-desktop
+default_cluster="${1:-docker-desktop}"
+
 export _cluster=$default_cluster && unset kind
 export _namespace=lab01
 
