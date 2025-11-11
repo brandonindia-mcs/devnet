@@ -34,7 +34,8 @@ cluster=docker-desktop
 namespace=default
 kcfg use-context $cluster
 
-kd all --all --namespace=$namespace
+kubectl delete all --all --namespace=$namespace
+kubectl delete all,secret,configmap,ingress,pvc --all --namespace=$namespace
 unset namespace
 
 ### DELETE NAMESPACE

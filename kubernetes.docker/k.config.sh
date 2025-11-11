@@ -9,9 +9,13 @@ alias kgrs="kubectl get rs"
 alias kgsts="kubectl get sts"
 alias kgs="kubectl get svc"
 alias kgi="kubectl get ingress"
+alias kname="kubectl config view --minify --output 'jsonpath={..namespace}'" # PRINT CURRENT NAMESPACE
+function ktail { kubectl logs -n $ns --max-log-requests=1 -f -l app=$selector ; }
 
 alias kd="kubectl delete"
 alias kdi="kubectl delete ingress"
+alias kdd="kubectl delete deployment"
+alias kdp="kubectl delete pod"
 
 alias kc="kubectl config"
 alias ka="kubectl apply"
@@ -19,6 +23,8 @@ alias ke="kubectl expose"
 alias kc="kubectl create"
 alias kcfg="kubectl config"
 alias kl="kubectl logs"
+alias klog="kubectl logs"
+alias klogs="kubectl logs"
 
 
 alias kget="kubectl get all"
