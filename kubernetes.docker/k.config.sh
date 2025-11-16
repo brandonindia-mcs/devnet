@@ -10,6 +10,7 @@ alias kgsts="kubectl get sts"
 alias kgs="kubectl get svc"
 alias kgi="kubectl get ingress"
 alias kname="kubectl config view --minify --output 'jsonpath={..namespace}'" # PRINT CURRENT NAMESPACE
+alias kuse="kubectl config set-context --current --namespace"
 function ktail { kubectl logs -n $ns --max-log-requests=1 -f -l app=$selector ; }
 
 alias kd="kubectl delete"
