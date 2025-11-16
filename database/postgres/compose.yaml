@@ -1,0 +1,57 @@
+services:
+  postgres_testing:
+    container_name: postgres_testing
+    image: postgres:17
+    restart: unless-stopped
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: $PGUSER
+      POSTGRES_PASSWORD: $PGPSWD
+      POSTGRES_DB: $PGDB
+    volumes:
+      - pgdata_testing:/var/lib/postgresql/data
+      - ./configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
+      - ./configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - appdev
+  postgres_appdevdb:
+    container_name: postgres_appdevdb
+    image: postgres:17
+    restart: unless-stopped
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: $PGUSER
+      POSTGRES_PASSWORD: $PGPSWD
+      POSTGRES_DB: $PGDB
+    volumes:
+      - pgdata_appdevdb:/var/lib/postgresql/data
+      - ./bootstrap:/docker-entrypoint-initdb.d
+      - ./configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
+      - ./configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - appdev
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@local.com
+      PGADMIN_DEFAULT_PASSWORD: P@ssw0rd!
+    networks:
+      - appdev
+
+networks:
+  appdev:
+    name: appdev
+    external: true
+
+volumes:
+  pgdata_testing:
+  pgdata_appdevdb:
+  
