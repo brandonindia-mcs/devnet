@@ -1,0 +1,28 @@
+services:
+  postgres:
+    container_name: $PGSERVER_CONTAINER
+    image: postgres:17
+    restart: unless-stopped
+    ports:
+      - ${PGPORT}:5432
+    environment:
+      POSTGRES_USER: $PGUSER
+      POSTGRES_PASSWORD: $PGPSWD
+      POSTGRES_DB: $PGDB
+    volumes:
+      - pgdatabase_distributed_systems:/var/lib/postgresql/data
+      - ./bootstrap:/docker-entrypoint-initdb.d
+      - ../configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
+      - ../configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - postgres
+
+volumes:
+  # pgdata_testing:
+  pgdatabase_distributed_systems:
+
+networks:
+  postgres:
+    name: postgres
+    external: true
