@@ -1,0 +1,30 @@
+services:
+  postgres_sa_test:
+    container_name: postgres_sa_test
+    image: postgres:17
+    restart: unless-stopped
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: P@ssw0rd!
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata_sa_test:/var/lib/postgresql/data
+      - ./bootstrap:/docker-entrypoint-initdb.d
+      - ../configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
+      - ../configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - postgres
+
+
+
+networks:
+  postgres:
+    name: postgres
+    external: true
+volumes:
+  # pgdata_testing:
+  pgdata_sa_test:
+  
