@@ -5,3 +5,4 @@ Dockerfile.user
 **/.kube
 **/.minikube
 kubectl*
+database/postgres/linkedin-agent-data/data
