@@ -12,8 +12,8 @@ services:
     volumes:
       - pgdata_marketing_ai_application:/var/lib/postgresql/data
       - ./bootstrap:/docker-entrypoint-initdb.d
-      - ../configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
-      - ../configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
+      - ./configs/postgresql.conf.17.appdev:/etc/postgresql/postgresql.conf
+      - ./configs/pg_hba.conf.17.appdev:/etc/postgresql/pg_hba.conf
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     networks:
       - postgres
